@@ -1,8 +1,8 @@
-//import { useState, useEffect } from 'react';
-//import { makeStyles } from '@material-ui/core/Button';
+import React from 'react';
+import Board from './Board';
 
 function Play(props) {
-  return ("hello world");
+  return (<Board />);
 }
 
 export default Play;

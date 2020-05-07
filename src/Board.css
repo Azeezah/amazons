@@ -1,16 +1,13 @@
 td {
   width: 50px;
   height: 50px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
 
 tr:nth-child(odd) td:nth-child(even),
 tr:nth-child(even) td:nth-child(odd) {
   background-color: #f2f2f2;
-}
-
-.amazonian {
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
 }
 
 .player1 {
@@ -27,6 +24,4 @@ tr:nth-child(even) td:nth-child(odd) {
 
 .arrow {
   background-image: url("arrow.svg");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
 }
