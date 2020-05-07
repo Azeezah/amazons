@@ -1,0 +1,36 @@
+{
+  "name": "amazons",
+  "version": "1.0.0",
+  "description": "A webapp for the Amazons boardgame",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/Azeezah/Amazons"
+  },
+  "keywords": [
+    "boardgame",
+    "board",
+    "game",
+    "amazons"
+  ],
+  "author": "Azeezah Muhammad",
+  "license": "ISC",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
