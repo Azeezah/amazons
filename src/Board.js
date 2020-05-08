@@ -1,22 +1,23 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { makeStyles } from "@material-ui/core/styles";
-import black_piece from './first.svg';
-import white_piece from './second.svg';
-import arrow from './arrow.svg';
+import { Pieces, FEN } from './BoardUtils';
+import player1Sprite from './first.svg';
+import player2Sprite from './second.svg';
+import arrowSprite from './arrow.svg';
 import './Board.css';
 
 const useStyles = makeStyles({
-  b: {
-    backgroundImage: "url("+ black_piece + ")",
+  [Pieces.player1]: {
+    backgroundImage: "url("+ player1Sprite + ")",
     cursor: "pointer",
   },
-  w: {
-    backgroundImage: "url("+ white_piece + ")",
+  [Pieces.player2]: {
+    backgroundImage: "url("+ player2Sprite + ")",
     cursor: "pointer",
   },
-  a: {
-    backgroundImage: "url("+ arrow + ")",
+  [Pieces.arrow]: {
+    backgroundImage: "url("+ arrowSprite + ")",
   },
   selected: {
     backgroundColor: "#33aa3377 !important",
@@ -49,7 +50,7 @@ function Board(props) {
   . . . . . . . .
   */
 
-  useEffect(()=>{setBoard(from_fen_string(props.fen || defaultBoard))}, [props.fen]);
+  useEffect(()=>{setBoard(FEN.toBoard(props.fen || defaultBoard))}, [props.fen]);
   useEffect(()=>{setOpponentMove(props.opponentMove)}, [props.opponentMove]);
   useEffect(renderSelection, [sourceSq]);
   useEffect(renderMove, [destinationSq]);
@@ -80,7 +81,7 @@ function Board(props) {
     if (!arrowSq || !board) { return; }
     let _board = board.map(row=>row.map(sq=>({...sq})));
     let [x, y] = arrowSq;
-    _board[y][x].piece = 'a';
+    _board[y][x].piece = Pieces.arrow;
     setBoard(_board);
     if (props.finishTurn) {
       props.finishTurn(_board);
@@ -93,7 +94,7 @@ function Board(props) {
     let _board = board.map(row=>row.map(sq=>({...sq})));
     _board[y][x].piece = _board[y0][x0].piece;
     _board[y0][x0].piece = '';
-    _board[ay][ax].piece = 'a';
+    _board[ay][ax].piece = Pieces.arrow;
     setBoard(_board);
   }
 
@@ -110,56 +111,6 @@ function Board(props) {
     setBoard(_board);
   }
   */
-
-  function from_fen_string(fen, size=8) {
-    let _board = [];
-    let y = 0;
-    for (let row of fen.split('/')) {
-      let x = 0;
-      _board.push(Array(size).fill(''));
-      for (let token of row.match(/\d+|w|b/g)) {
-        if (+token) {
-          x += +token;
-        }
-        else {
-          _board[y][x] = { piece:token };
-          x++;
-        }
-      }
-      y++;
-    }
-    return _board;
-  }
-
-  function to_fen_string(_board) {
-    const row_fen = row => {
-      let fen = "";
-      let num_empty = 0;
-      for (let token of row) {
-        if (!token) { num_empty += 1 }
-        else {
-          fen += (num_empty || "") + token;
-          num_empty = 0;
-        }
-
-      }
-      fen += num_empty || "";
-      return fen;
-    }
-    return board.map(row_fen).join('/');
-  }
-
-  function all(bools) { return bools.reduce((truth, b) => truth && b, true) }
-
-  function verify_fen(fen, size=8) {
-    // Verify that there are `size` rows, formatted with the correct tokens.
-    if (!fen.match(new RegExp(Array(size).fill("([wb]|\\d+)*").join('/')))) {
-      return false;
-    }
-    // Verify that each row's contents sum to `size`.
-    return all(fen.split('/').map(row => !row || size === row.match(/\d+|w|b/g)
-        .reduce((sum, token) => sum + (+token||1), 0)));
-  }
 
   function clickSq(e) {
     let {x, y} = e.target.dataset;

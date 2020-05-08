@@ -1,25 +1,4 @@
-function line_of_sight(board, start, finish) {
-  let [x0, y0] = start;
-  let [x, y] = finish;
-  let [dx, dy] = [x-x0, y-y0];
-
-  // Check whether start and finish are colinear.
-  if (![dx+dy, dx-dy, dx, dy].includes(0)) {
-    return false;
-  }
-
-  // Map (-inf, inf) onto {-1, 0, 1}.
-  let [ux, uy] = [dx?dx/Math.abs(dx):0, dy?dy/Math.abs(dy):0];
-
-  // Iterate over intervening squares and return false if any are not empty
-  // (excluding start square, including end square).
-  for (let i=ux, j=uy; i!==dx+ux || j!==dy+uy; i+=ux, j+=uy) {
-    if (board[y0+j][x0+i].piece) {
-      return false;
-    }
-  }
-  return true;
-}
+import { line_of_sight } from './BoardUtils';
 
 function arr_eq(arr1, arr2) {
   if (arr1.length !== arr2.length) { return false; }
