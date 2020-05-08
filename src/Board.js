@@ -27,6 +27,7 @@ function Board(props) {
   // props:
   //    position ::= fen string
   //    doMove ::= (x, y) => void
+  //    opponentMove ::= [[x0,y0], [x,y], [ax, ay]]
   const classes = useStyles();
   const phases = {selectPiece:0, selectDestination:1, placeArrow:2};
   const [movePhase, setMovePhase] = useState(phases.selectPiece);
@@ -34,6 +35,7 @@ function Board(props) {
   const [destinationSq, setDestinationSq] = useState(null);
   const [arrowSq, setArrowSq] = useState(null);
   const [board, setBoard] = useState([]);
+  const [opponentMove, setOpponentMove] = useState(props.opponentMove);
   const defaultBoard = "8/2w2b2/1b4w1/8/8/1w4b1/2b2w2/8";
   /*
   default board:
@@ -48,9 +50,11 @@ function Board(props) {
   */
 
   useEffect(()=>{setBoard(from_fen_string(props.fen || defaultBoard))}, [props.fen]);
+  useEffect(()=>{setOpponentMove(props.opponentMove)}, [props.opponentMove]);
   useEffect(renderSelection, [sourceSq]);
   useEffect(renderMove, [destinationSq]);
   useEffect(renderArrow, [arrowSq]);
+  useEffect(renderOpponentMove, [opponentMove]);
 
   function renderSelection() {
     if (!board || !board.length) { return; }
@@ -78,7 +82,34 @@ function Board(props) {
     let [x, y] = arrowSq;
     _board[y][x].piece = 'a';
     setBoard(_board);
+    if (props.finishTurn) {
+      props.finishTurn(_board);
+    }
   }
+
+  function renderOpponentMove() {
+    if (!opponentMove || !board) { return; }
+    let [[x0, y0], [x, y], [ax, ay]] = opponentMove;
+    let _board = board.map(row=>row.map(sq=>({...sq})));
+    _board[y][x].piece = _board[y0][x0].piece;
+    _board[y0][x0].piece = '';
+    _board[ay][ax].piece = 'a';
+    setBoard(_board);
+  }
+
+  /*
+  // Todo: See if this way of managing moves isn't too laggy.
+  function renderMoves() {
+    if (!moves || !board) { return; }
+    let _board = board.map(row=>row.map(sq=>({...sq})));
+    for (let [[x0, y0], [x, y], [ax, ay]] of moves) {
+      _board[y][x].piece = _board[y0][x0].piece;
+      _board[y0][x0].piece = '';
+      _board[ay][ax].piece = 'a';
+    }
+    setBoard(_board);
+  }
+  */
 
   function from_fen_string(fen, size=8) {
     let _board = [];
@@ -131,7 +162,6 @@ function Board(props) {
   }
 
   function clickSq(e) {
-    console.log(e.target.dataset, movePhase);
     let {x, y} = e.target.dataset;
     switch(movePhase) {
       case phases.selectPiece:
@@ -144,11 +174,7 @@ function Board(props) {
         // Todo: Allow player to change selection.
         break;
       case phases.placeArrow:
-        let _arrowSq = [x, y];
-        setArrowSq(_arrowSq);
-        if (props.doMove) {
-          props.doMove(sourceSq, destinationSq, _arrowSq);
-        }
+        setArrowSq([x, y]);
         setMovePhase(phases.selectPiece);
         break;
       default:
