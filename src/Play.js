@@ -15,7 +15,7 @@ function Play(props) {
   }
 
   return <Board finishTurn={fetchOpponentMove} opponentMove={opponentMove}
-                player={player} />;
+                player={player} opponent={opponent} />;
 }
 
 export default Play;
