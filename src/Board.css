@@ -25,3 +25,7 @@ tr:nth-child(even) td:nth-child(odd) {
 .arrow {
   background-image: url("arrow.svg");
 }
+
+.board-table {
+  border-collapse: collapse;
+}
