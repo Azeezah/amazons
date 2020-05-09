@@ -21,8 +21,10 @@ export class FEN {
     let board = [];
     let y = 0;
     for (let row of fen.split('/')) {
+      // Initialize each row with empty objects.  We avoid using `.fill({})`
+      // so they don't all reference the same object.
+      board.push(Array(size).fill(null).map(()=>({})));
       let x = 0;
-      board.push(Array(size).fill(''));
       for (let token of row.match(/\d+|w|b/g)) {
         if (+token) {
           x += +token;

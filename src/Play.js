@@ -7,7 +7,7 @@ import firebase from 'firebase';
 
 function Play(props) {
   const [gameid, setGameid] = useState(props.gameid || "defaultgame");
-  const [opponentMove, setOpponentMove] = useState(null);
+  const [moves, setMoves] = useState([]);
   const [player, setPlayer] = useState(Pieces.player1);
   const [opponent, setOpponent] = useState(Pieces.player2);
 
@@ -23,13 +23,12 @@ function Play(props) {
       if (doc.data().playerToMove === player) {
         let moves = JSON.parse(doc.data().moves);
         if (moves && moves.length) {
-          let move = moves[moves.length-1];
-          setOpponentMove(move);
+          setMoves(moves);
         }
       }
     });
     return () => unsubscribe();
-  }, [player, opponent]);
+  }, [player, opponent, gameid]);
 
 
   function sendMoves(moves) {
@@ -37,15 +36,19 @@ function Play(props) {
     firebase.firestore().collection('games').doc(gameid).set({moves:_moves, playerToMove:opponent});
   }
 
-  function runBot(board) {
+  function runBot(board, moves) {
     let player_piece = opponent;
-    setOpponentMove(SkittleBot.move(board, player_piece));
+    let move = SkittleBot.move(board, player_piece);
+    setMoves([...moves, move]);
+    // Local bot should send moves to the database for the spectators.
+    let _moves = JSON.stringify([...moves, move]);
+    firebase.firestore().collection('games').doc(gameid).set({moves:_moves, playerToMove:player});
   }
 
   function finishTurn(board, moves) {
     let useBot = false;
     if (useBot) {
-      runBot(board);
+      runBot(board, moves);
     } else {
       sendMoves(moves);
     }
@@ -59,8 +62,8 @@ function Play(props) {
   return (<>
     You are {player}<br />
     <button onClick={swapSides}>swap</button>
-    <Board finishTurn={finishTurn} opponentMove={opponentMove}
-                player={player} opponent={opponent} />
+    <Board finishTurn={finishTurn} moves={moves} player={player}
+           opponent={opponent} />
     </>);
 }
 

@@ -39,8 +39,6 @@ function Board(props) {
   const [movePhase, setMovePhase] = useState(phases.selectPiece);
   const [sourceSq, setSourceSq] = useState(null);
   const [destinationSq, setDestinationSq] = useState(null);
-  const [arrowSq, setArrowSq] = useState(null);
-  const [opponentMove, setOpponentMove] = useState(props.opponentMove);
   const defaultBoard = "8/2w2b2/1b4w1/8/8/1w4b1/2b2w2/8";
   /*
   default board:
@@ -57,13 +55,11 @@ function Board(props) {
   useEffect(()=>{setBoard(FEN.toBoard(props.fen || defaultBoard))}, [props.fen]);
   useEffect(()=>{setPlayer(props.player || Pieces.player1)}, [props.player]);
   useEffect(()=>{setOpponent(props.opponent || Pieces.player2)}, [props.opponent]);
-  useEffect(()=>{setOpponentMove(props.opponentMove)}, [props.opponentMove]);
+  useEffect(()=>{setMoves(props.moves)}, [props.moves]);
   useEffect(renderSelection, [sourceSq]);
   useEffect(renderMove, [destinationSq]);
-  useEffect(renderArrow, [arrowSq]);
-  useEffect(renderOpponentMove, [opponentMove]);
+  useEffect(renderMoves, [moves]);
 
-  // Todo: Refactor these since `render` implies idempotency.
   function renderSelection() {
     if (!board || !board.length) { return; }
     let _board = board.map(row=>row.map(sq=>({...sq, selected:false})));
@@ -78,47 +74,43 @@ function Board(props) {
     if (!sourceSq || !destinationSq || !board) { return; }
     let [x0, y0] = sourceSq;
     let [x, y] = destinationSq;
+
+    // Don't render the same move twice.
+    if (board[y][x].piece) { return; }
     let _board = board.map(row=>row.map(sq=>({...sq, selected:false})));
     _board[y][x].piece = _board[y0][x0].piece;
     _board[y0][x0].piece = '';
     setBoard(_board);
   }
 
-  function renderArrow() {
-    if (!arrowSq || !board) { return; }
+  function finishMove(arrowSq) {
     let _board = board.map(row=>row.map(sq=>({...sq})));
     let [x, y] = arrowSq;
     _board[y][x].piece = Pieces.arrow;
-    setBoard(_board);
-    setPlayerToMove(opponent);
+
     let move = [sourceSq, destinationSq, arrowSq];
     setMoves([...moves, move]);
+    // Todo: Fix potential concurrency bug.
+    // What if bot sends a move before moves is updated here?  Bot's move would
+    // be overwritten and it wouldn't know to move again.  We'd have the same
+    // problem if we updated board here instead.  Either way, we'd like to see
+    // the arrow rendered before the opponent's move comes in.
+
     if (props.finishTurn) {
       props.finishTurn(_board, [...moves, move]);
     }
   }
 
-  function renderOpponentMove() {
-    if (!opponentMove || !board) { return; }
-    let [[x0, y0], [x, y], [ax, ay]] = opponentMove;
-    let _board = board.map(row=>row.map(sq=>({...sq})));
-    _board[y][x].piece = _board[y0][x0].piece;
-    _board[y0][x0].piece = '';
-    _board[ay][ax].piece = Pieces.arrow;
-    setBoard(_board);
-    setPlayerToMove(player);
-    setMoves([...moves, opponentMove]);
-  }
-
   function renderMoves() {
-    if (!moves || !board) { return; }
-    let _board = board.map(row=>row.map(sq=>({...sq})));
+    if (!moves || !moves.length) { return; }
+    let _board = FEN.toBoard(props.fen || defaultBoard);
     for (let [[x0, y0], [x, y], [ax, ay]] of moves) {
       _board[y][x].piece = _board[y0][x0].piece;
       _board[y0][x0].piece = '';
       _board[ay][ax].piece = Pieces.arrow;
     }
     setBoard(_board);
+    setPlayerToMove(moves.length%2===0 ? Pieces.player1 : Pieces.player2);
   }
 
   function clickSq(e) {
@@ -140,7 +132,7 @@ function Board(props) {
         break;
       case phases.placeArrow:
         if (!line_of_sight(board, destinationSq, [x, y])) { return; }
-        setArrowSq([x, y]);
+        finishMove([x, y]);
         setMovePhase(phases.selectPiece);
         break;
       default:
