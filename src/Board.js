@@ -26,13 +26,15 @@ const useStyles = makeStyles({
 
 function Board(props) {
   // props:
-  //    position ::= fen string
-  //    doMove ::= (x, y) => void
-  //    opponentMove ::= [[x0,y0], [x,y], [ax, ay]]
+  //    startPosition ::= FEN string
+  //    finishTurn ::= (board, moves) => void
+  //    moves ::= [move]
+  //      where move ::= [sourceSq, destinationSq, arrowSq]
+  //      where Sq ::= [x, y]
+  //    player ::= Pieces.player1 || Pieces.player2
   const classes = useStyles();
   const [board, setBoard] = useState([]);
   const [player, setPlayer] = useState(Pieces.player1);
-  const [opponent, setOpponent] = useState(Pieces.player2);
   const [playerToMove, setPlayerToMove] = useState(Pieces.player1);
   const [moves, setMoves] = useState([]);
   const phases = {selectPiece:0, selectDestination:1, placeArrow:2};
@@ -52,9 +54,8 @@ function Board(props) {
   . . . . . . . .
   */
 
-  useEffect(()=>{setBoard(FEN.toBoard(props.fen || defaultBoard))}, [props.fen]);
+  useEffect(()=>{setBoard(FEN.toBoard(props.startPosition || defaultBoard))}, [props.startPosition]);
   useEffect(()=>{setPlayer(props.player || Pieces.player1)}, [props.player]);
-  useEffect(()=>{setOpponent(props.opponent || Pieces.player2)}, [props.opponent]);
   useEffect(()=>{setMoves(props.moves)}, [props.moves]);
   useEffect(renderSelection, [sourceSq]);
   useEffect(renderMove, [destinationSq]);
@@ -103,7 +104,7 @@ function Board(props) {
 
   function renderMoves() {
     if (!moves || !moves.length) { return; }
-    let _board = FEN.toBoard(props.fen || defaultBoard);
+    let _board = FEN.toBoard(props.startPosition || defaultBoard);
     for (let [[x0, y0], [x, y], [ax, ay]] of moves) {
       _board[y][x].piece = _board[y0][x0].piece;
       _board[y0][x0].piece = '';
