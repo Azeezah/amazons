@@ -28,4 +28,5 @@ tr:nth-child(even) td:nth-child(odd) {
 
 .board-table {
   border-collapse: collapse;
+  margin: auto;
 }

@@ -34,6 +34,7 @@ function Board(props) {
   const [player, setPlayer] = useState(Pieces.player1);
   const [opponent, setOpponent] = useState(Pieces.player2);
   const [playerToMove, setPlayerToMove] = useState(Pieces.player1);
+  const [moves, setMoves] = useState([]);
   const phases = {selectPiece:0, selectDestination:1, placeArrow:2};
   const [movePhase, setMovePhase] = useState(phases.selectPiece);
   const [sourceSq, setSourceSq] = useState(null);
@@ -62,6 +63,7 @@ function Board(props) {
   useEffect(renderArrow, [arrowSq]);
   useEffect(renderOpponentMove, [opponentMove]);
 
+  // Todo: Refactor these since `render` implies idempotency.
   function renderSelection() {
     if (!board || !board.length) { return; }
     let _board = board.map(row=>row.map(sq=>({...sq, selected:false})));
@@ -89,8 +91,10 @@ function Board(props) {
     _board[y][x].piece = Pieces.arrow;
     setBoard(_board);
     setPlayerToMove(opponent);
+    let move = [sourceSq, destinationSq, arrowSq];
+    setMoves([...moves, move]);
     if (props.finishTurn) {
-      props.finishTurn(_board);
+      props.finishTurn(_board, [...moves, move]);
     }
   }
 
@@ -103,26 +107,24 @@ function Board(props) {
     _board[ay][ax].piece = Pieces.arrow;
     setBoard(_board);
     setPlayerToMove(player);
+    setMoves([...moves, opponentMove]);
   }
 
-  /*
-  // Todo: See if this way of managing moves isn't too laggy.
   function renderMoves() {
     if (!moves || !board) { return; }
     let _board = board.map(row=>row.map(sq=>({...sq})));
     for (let [[x0, y0], [x, y], [ax, ay]] of moves) {
       _board[y][x].piece = _board[y0][x0].piece;
       _board[y0][x0].piece = '';
-      _board[ay][ax].piece = 'a';
+      _board[ay][ax].piece = Pieces.arrow;
     }
     setBoard(_board);
   }
-  */
 
   function clickSq(e) {
     if (playerToMove !== player) { return; }
-    let x = +e.target.dataset.x;
-    let y = +e.target.dataset.y;
+    const x = +e.target.dataset.x;
+    const y = +e.target.dataset.y;
 
     switch(movePhase) {
       case phases.selectPiece:
