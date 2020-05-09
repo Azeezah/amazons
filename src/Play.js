@@ -4,18 +4,18 @@ import { SkittleBot } from './Bots';
 import { Pieces } from './BoardUtils';
 import Board from './Board';
 import firebase from 'firebase';
+import Authentication from './Authentication';
 
 function Play(props) {
   const [gameid, setGameid] = useState(props.gameid);
   const [moves, setMoves] = useState([]);
   const [player, setPlayer] = useState(Pieces.player1);
   const [opponent, setOpponent] = useState(Pieces.player2);
-  const [user, setUser] = useState("Azeezah");
+  const [user, setUser] = useState(null);
 
   const defaultGame = {
-    player1id: "Azeezah",
-    player2id: "SkittleBot",
-    moves: [],
+    player1: {displayName: "Azeezah"},
+    player2: {displayName: "SkittleBot"},
   }
 
   const [game, setGame] = useState(defaultGame);
@@ -24,20 +24,27 @@ function Play(props) {
   useEffect(listenForMoves, [gameid]);
   useEffect(()=>{loadGame();}, [gameid]);
   useEffect(updateLocalPlayer, [game, user]);
+  useEffect(() => {
+    Authentication.getUser().then(user=>setUser(user));
+  }, []);
 
   function updateLocalPlayer() {
     // Todo: Implement spectators.
     // Todo: Abstract other player.
-    setPlayer(user === game.player1id ? Pieces.player1 : Pieces.player2);
-    setOpponent(user === game.player1id ? Pieces.player2 : Pieces.player1);
+    if (!game || !user) { return; }
+    setPlayer(user.id === game.player1id ? Pieces.player1 : Pieces.player2);
+    setOpponent(user.id === game.player1id ? Pieces.player2 : Pieces.player1);
   }
 
   async function loadGame() {
     if (!gameid) { return; }
-    const _game = await firebase.firestore().collection('games').doc(gameid).get();
-    if (!_game) { console.log("Couldn't load game."); }
-    console.log(_game.data());
-    setGame(_game ? _game.data() : defaultGame);
+    const response = await firebase.firestore().collection('games').doc(gameid).get();
+    if (!response) { console.log("Couldn't load game."); }
+    const _game = response.data();
+    _game.player1 = await Authentication.getUserById(_game.player1id);
+    _game.player2 = await Authentication.getUserById(_game.player2id);
+    console.log(_game);
+    setGame(_game);
   }
 
   function listenForMoves() {
@@ -95,7 +102,7 @@ function Play(props) {
   }
 
   return (<>
-    Game: {game.player1id} vs {game.player2id}<br />
+    Game: {game.player1.displayName} vs {game.player2.displayName}<br />
     You are {player}<br />
     <button onClick={swapSides}>Swap Sides</button>
     <button onClick={toggleBot}>{useBot ? "Disable Bot" : "Enable Bot"}</button>

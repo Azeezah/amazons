@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import firebase from 'firebase';
 import {Pieces} from './BoardUtils';
+import Authentication from './Authentication';
 
 function Home() {
   const [proposalId, setProposalId] = useState(null);
   const [proposals, setProposals] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    Authentication.getUser().then(user=>setUser(user));
+  }, []);
 
   useEffect(listenForProposals, [proposalId]);
 
@@ -21,6 +27,7 @@ function Home() {
           _proposals.push({
             id: doc.data().id,
             proposerid: doc.data().proposerid,
+            proposerDisplayName: doc.data().proposerDisplayName,
           });
         }
       });
@@ -31,17 +38,24 @@ function Home() {
 
   // Todo: Reap abandoned game proposals.
   function newGame(e) {
+    if (!user) { return; }
     e.target.disabled = true;
     const proposal = firebase.firestore().collection('proposals').doc();
-    proposal.set({id:proposal.id, open:true, proposerid:'Guest'});
+    proposal.set({
+      id: proposal.id,
+      open: true,
+      proposerid: user.id,
+      proposerDisplayName: user.displayName,
+    });
     setProposalId(proposal.id);
   }
 
   // Todo: Make this a transaction since it requires atomicity.
   async function joinGame(e) {
+    if (!user) { return; }
     const proposalid = e.target.dataset.proposalid;
     const proposerid = e.target.dataset.proposerid;
-    const userid = 'Joiner';
+    const userid = user.id;
     const players = [userid, proposerid];
     const [player1id, player2id] = Math.random() > 0.5 ? players : players.reverse();
 
@@ -59,7 +73,7 @@ function Home() {
   }
 
   return (<div>
-    Welcome! <br />
+    Welcome {user ? user.displayName : ""}! <br />
     <button onClick={newGame}>New Game</button>
     <ul>
     {
@@ -68,7 +82,7 @@ function Home() {
           <li key={i}><button
             data-proposalid={p.id}
             data-proposerid={p.proposerid}
-            onClick={joinGame}>Join Game with {p.proposerid}</button></li>)
+            onClick={joinGame}>Join Game with {p.proposerDisplayName}</button></li>)
       : ""
     }
     </ul>
