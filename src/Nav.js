@@ -7,6 +7,8 @@ const useStyles = makeStyles({
     width: '100%',
     display: 'flex',
     justifyContent: 'center',
+    overflow: 'hidden',
+    paddingTop: '30px',
   },
   logo: {
     filter: 'hue-rotate(193deg) contrast(1)',

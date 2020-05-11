@@ -1,12 +1,40 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { makeStyles } from "@material-ui/core/styles";
+import Button from "@material-ui/core/Button";
 import { SkittleBot } from './Bots';
 import { Pieces } from './BoardUtils';
 import Board from './Board';
 import firebase from 'firebase';
 import Authentication from './Authentication';
+import player1PieceImage from './first.svg';
+import player2PieceImage from './second.svg';
+
+const useStyles = makeStyles({
+  row: {
+    paddingTop: '30px',
+    display: 'flex',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  buttonRow: {
+    padding: '30px',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  playerCard: {
+    flexShrink: '10',
+    display: 'flex',
+    flexDirection: 'column',
+    textAlign: 'center',
+  },
+  playerImage: {
+    width: '130px',
+  },
+});
 
 function Play(props) {
+  const classes = useStyles();
   const [gameid, setGameid] = useState(props.gameid);
   const [moves, setMoves] = useState([]);
   const [player, setPlayer] = useState(Pieces.player1);
@@ -101,12 +129,43 @@ function Play(props) {
     setUseBot(!useBot);
   }
 
+  const player1ToMove = moves.length % 2 === 0;
+
   return (<>
-    Game: {game.player1.displayName} vs {game.player2.displayName}<br />
-    You are {player}<br />
-    <button onClick={swapSides}>Swap Sides</button>
-    <button onClick={toggleBot}>{useBot ? "Disable Bot" : "Enable Bot"}</button>
-    <Board finishTurn={finishTurn} moves={moves} player={player} />
+    <div className={classes.row}>
+      <div className={classes.playerCard}>
+        <img className={classes.playerImage} src={player1PieceImage} />
+        <span>{game.player1.displayName}</span>
+        <span>
+          {
+            player === Pieces.player1 && player1ToMove
+          ? "Your Turn"
+          :  player === Pieces.player2 && player1ToMove
+          ? "Waiting for Opponent"
+          : <>&nbsp;</>
+          }
+        </span>
+      </div>
+      <Board finishTurn={finishTurn} moves={moves} player={player} />
+      <div className={classes.playerCard}>
+        <img className={classes.playerImage} src={player2PieceImage} />
+        <span>{game.player2.displayName}</span>
+        <span>
+          {
+            player === Pieces.player2 && !player1ToMove
+          ? "Your Turn"
+          :  player === Pieces.player1 && !player1ToMove
+          ? "Waiting for Opponent"
+          : <>&nbsp;</>
+          }
+        </span>
+      </div>
+    </div>
+    <div className={classes.buttonRow}>
+      <Button variant="outlined" onClick={swapSides}>Swap Sides</Button>
+      &nbsp;
+      <Button variant="outlined" onClick={toggleBot}>{useBot ? "Disable Bot" : "Enable Bot"}</Button>
+    </div>
     </>);
 }
 
