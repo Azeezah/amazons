@@ -54,6 +54,7 @@ function Board(props) {
   . . . . . . . .
   */
 
+  // Todo: Fix bug where user is stuck in select phase if they swap sides.
   useEffect(()=>{setBoard(FEN.toBoard(props.startPosition || defaultBoard))}, [props.startPosition]);
   useEffect(()=>{setPlayer(props.player || Pieces.player1)}, [props.player]);
   useEffect(()=>{setMoves(props.moves)}, [props.moves]);
