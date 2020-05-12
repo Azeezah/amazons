@@ -96,3 +96,13 @@ export function line_of_sight(board, start, finish) {
   return true;
 }
 
+export function movesToBoard(moves, startPosition="8/2w2b2/1b4w1/8/8/1w4b1/2b2w2/8") {
+  let _board = FEN.toBoard(startPosition);
+  for (let [[x0, y0], [x, y], [ax, ay]] of moves) {
+    _board[y][x].piece = _board[y0][x0].piece;
+    _board[y0][x0].piece = '';
+    _board[ay][ax].piece = Pieces.arrow;
+  }
+  return _board;
+}
+

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { makeStyles } from "@material-ui/core/styles";
-import { Pieces, FEN, line_of_sight } from './BoardUtils';
+import { Pieces, FEN, line_of_sight, movesToBoard } from './BoardUtils';
 import player1Sprite from './first.svg';
 import player2Sprite from './second.svg';
 import arrowSprite from './arrow.svg';
@@ -27,7 +27,7 @@ const useStyles = makeStyles({
 function Board(props) {
   // props:
   //    startPosition ::= FEN string
-  //    finishTurn ::= (board, moves) => void
+  //    finishTurn ::= (moves) => void
   //    moves ::= [move]
   //      where move ::= [sourceSq, destinationSq, arrowSq]
   //      where Sq ::= [x, y]
@@ -86,32 +86,16 @@ function Board(props) {
   }
 
   function finishMove(arrowSq) {
-    let _board = board.map(row=>row.map(sq=>({...sq})));
-    let [x, y] = arrowSq;
-    _board[y][x].piece = Pieces.arrow;
-
     let move = [sourceSq, destinationSq, arrowSq];
     setMoves([...moves, move]);
-    // Todo: Fix potential concurrency bug.
-    // What if bot sends a move before moves is updated here?  Bot's move would
-    // be overwritten and it wouldn't know to move again.  We'd have the same
-    // problem if we updated board here instead.  Either way, we'd like to see
-    // the arrow rendered before the opponent's move comes in.
-
     if (props.finishTurn) {
-      props.finishTurn(_board, [...moves, move]);
+      props.finishTurn([...moves, move]);
     }
   }
 
   function renderMoves() {
     if (!moves || !moves.length) { return; }
-    let _board = FEN.toBoard(props.startPosition || defaultBoard);
-    for (let [[x0, y0], [x, y], [ax, ay]] of moves) {
-      _board[y][x].piece = _board[y0][x0].piece;
-      _board[y0][x0].piece = '';
-      _board[ay][ax].piece = Pieces.arrow;
-    }
-    setBoard(_board);
+    setBoard(movesToBoard(moves));
     setPlayerToMove(moves.length%2===0 ? Pieces.player1 : Pieces.player2);
   }
 

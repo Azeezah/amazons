@@ -19,9 +19,12 @@ class Authentication {
   }
 
   static async getUserById(id) {
+    const names = {
+      'skittlebotid' : 'SkittleBot',
+    }
     const user = {};
     user.id = id;
-    user.displayName = getPseudonym(id);
+    user.displayName = names[id] || getPseudonym(id);
     return user;
   }
 }
