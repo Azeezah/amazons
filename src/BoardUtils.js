@@ -80,6 +80,9 @@ export function line_of_sight(board, start, finish) {
     return false;
   }
 
+  // Check whether start is finish.
+  if (x0 === x && y0 === y) { return false; }
+
   // Map (-inf, inf) onto {-1, 0, 1}.
   let [ux, uy] = [dx?dx/Math.abs(dx):0, dy?dy/Math.abs(dy):0];
 
