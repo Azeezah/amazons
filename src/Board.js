@@ -23,6 +23,9 @@ const useStyles = makeStyles({
   selected: {
     backgroundColor: "#33aa3377 !important",
   },
+  highlighted: {
+    backgroundColor: "#c6d6ff !important",
+  },
   sq: {
     overflow: 'hidden',
   },
@@ -108,7 +111,12 @@ function Board(props) {
 
   function renderMoves() {
     if (!moves || !moves.length) { return; }
-    setBoard(movesToBoard(moves));
+    const _board = movesToBoard(moves);
+    // Highlight the last move.
+    for (let [x, y] of moves[moves.length-1]) {
+      _board[y][x].highlighted = true;
+    }
+    setBoard(_board);
     setPlayerToMove(moves.length%2===0 ? Pieces.player1 : Pieces.player2);
   }
 
@@ -167,8 +175,12 @@ function Board(props) {
                 data-x={x}
                 data-y={y}
                 onClick={clickSq}
-                className={[classes.sq, classes[sq.piece],
-                  (sq.selected ? classes.selected : '')].join(' ')}>
+                className={[
+                  classes.sq,
+                  classes[sq.piece],
+                  (sq.selected ? classes.selected : ''),
+                  (sq.highlighted ? classes.highlighted : ''),
+                ].join(' ')}>
                 {
                   destinationSq && destinationSq.join() === [x, y].join()
                   ? <img className={classes.bow} src={bowSprite} alt="bow" />
