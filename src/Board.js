@@ -124,10 +124,14 @@ function Board(props) {
         setMovePhase(phases.selectDestination);
         break;
       case phases.selectDestination:
+        if (board[y][x].piece === player) {
+          // Allow player to change selection.
+          setSourceSq([x, y]);
+          break;
+        }
         if (!line_of_sight(board, sourceSq, [x, y])) { return; }
         setDestinationSq([x, y]);
         setMovePhase(phases.placeArrow);
-        // Todo: Allow player to change selection.
         break;
       case phases.placeArrow:
         if (!line_of_sight(board, destinationSq, [x, y])) { return; }
