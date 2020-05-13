@@ -23,7 +23,7 @@ const useStyles = makeStyles({
     justifyContent: 'center',
   },
   playerCard: {
-    flexShrink: '10',
+    flexShrink: '1',
     display: 'flex',
     flexDirection: 'column',
     textAlign: 'center',
@@ -34,6 +34,9 @@ const useStyles = makeStyles({
   },
   playerImage: {
     width: '130px',
+  },
+  board: {
+    flexShrink: '0',
   },
 });
 
@@ -154,7 +157,7 @@ function Play(props) {
       <div className={classes.playerCard}>
         <img className={classes.playerImage} src={player1PieceImage} alt="player1" />
         <span>{game.player1.displayName}</span>
-        <span style={{width:'200%'}}>
+        <span>
           {
             player === Pieces.player1 && player1ToMove
           ? "Your Turn"
@@ -164,11 +167,13 @@ function Play(props) {
           }
         </span>
       </div>
-      <Board finishTurn={finishTurn} moves={moves} player={player} />
+      <div className={classes.board}>
+        <Board finishTurn={finishTurn} moves={moves} player={player} />
+      </div>
       <div className={classes.playerCard}>
         <img className={classes.playerImage} src={player2PieceImage} alt="player2" />
         <span>{game.player2.displayName}</span>
-        <span style={{width:'200%'}}>
+        <span>
           {
             player === Pieces.player2 && !player1ToMove
           ? "Your Turn"
