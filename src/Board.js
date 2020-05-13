@@ -5,6 +5,7 @@ import { Pieces, FEN, line_of_sight, movesToBoard } from './BoardUtils';
 import player1Sprite from './first.svg';
 import player2Sprite from './second.svg';
 import arrowSprite from './arrow.svg';
+import bowSprite from './bowandarrow.jpg';
 import './Board.css';
 
 const useStyles = makeStyles({
@@ -21,6 +22,16 @@ const useStyles = makeStyles({
   },
   selected: {
     backgroundColor: "#33aa3377 !important",
+  },
+  sq: {
+    overflow: 'hidden',
+  },
+  // Todo: Make the background transparent so we don't need mix blend mode.
+  // Todo: Find find a cleaner way to make the image not expand the box.
+  bow: {
+    width: '70.71%',  // 100% / sqrt 2: So the image doesn't expand the box.
+    height: '70.71%',
+    mixBlendMode: 'multiply',
   },
 });
 
@@ -86,6 +97,8 @@ function Board(props) {
   }
 
   function finishMove(arrowSq) {
+    setSourceSq(null);
+    setDestinationSq(null);
     let move = [sourceSq, destinationSq, arrowSq];
     setMoves([...moves, move]);
     if (props.finishTurn) {
@@ -126,8 +139,21 @@ function Board(props) {
     }
   }
 
+  function rotateBow(e) {
+    for (let bow of document.getElementsByClassName(classes.bow)) {
+      const rect = bow.getBoundingClientRect();
+      const x0 = rect.left + rect.width / 2;
+      const y0 = rect.top + rect.height / 2;
+      const x = e.clientX;
+      const y = e.clientY;
+      const angle = Math.atan2(y-y0, x-x0) * 360 / (2 * Math.PI);
+      bow.style.transform = 'rotateZ('+angle+'deg)';
+    }
+  }
+
   return (
-    <table className="board-table"><tbody className="board">
+    <table className="board-table" onMouseMove={rotateBow}>
+    <tbody className="board">
     {
       board.map((row, y) =>
         <tr>
@@ -137,12 +163,19 @@ function Board(props) {
                 data-x={x}
                 data-y={y}
                 onClick={clickSq}
-                className={[classes[sq.piece],
-                  (sq.selected ? classes.selected : '')].join(' ')}></td>)
+                className={[classes.sq, classes[sq.piece],
+                  (sq.selected ? classes.selected : '')].join(' ')}>
+                {
+                  destinationSq && destinationSq.join() === [x, y].join()
+                  ? <img className={classes.bow} src={bowSprite} alt="bow" />
+                  : ""
+                }
+              </td>)
           }
         </tr>)
     }
-    </tbody></table>
+    </tbody>
+    </table>
   );
 }
 export default Board;
