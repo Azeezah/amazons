@@ -106,3 +106,24 @@ export function movesToBoard(moves, startPosition="8/2w2b2/1b4w1/8/8/1w4b1/2b2w2
   return _board;
 }
 
+export function isEndOfGame(moves) {
+  // Look at each queen.  If any of its surrounding squares is empty,
+  // return false.
+  const board = movesToBoard(moves);
+  const deltas =
+    [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+  const onBoard =
+    (x, y) => 0 <= y && y < board.length && 0 <= x && x < board[0].length;
+  for (let y=0; y<board.length; y++) {
+    for (let x=0; x<board[y].length; x++) {
+      if ([Pieces.player1, Pieces.player2].includes(board[y][x].piece)) {
+        for (let [dx, dy] of deltas) {
+          if (onBoard(x+dx, y+dy) && !board[y+dy][x+dx].piece) {
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
+}

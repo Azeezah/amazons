@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import { SkittleBot } from './Bots';
-import { Pieces, movesToBoard } from './BoardUtils';
+import { Pieces, movesToBoard, isEndOfGame } from './BoardUtils';
 import Board from './Board';
+import GameEndModal from './GameEnd';
 import firebase from 'firebase';
 import Authentication from './Authentication';
 import player1PieceImage from './first.svg';
@@ -48,6 +49,7 @@ function Play(props) {
   const [opponent, setOpponent] = useState(Pieces.player2);
   const [user, setUser] = useState(null);
   const [useBot, setUseBot] = useState(true);
+  const [endOfGame, setEndOfGame] = useState(false);
 
   const defaultGame = {
     player1: {displayName: "You"},
@@ -99,6 +101,9 @@ function Play(props) {
       let moves = JSON.parse(doc.data().moves);
       if (moves && moves.length) {
         setMoves(moves);
+        if (isEndOfGame(moves)) {
+          setEndOfGame(true);
+        }
       }
     });
     return () => unsubscribe();
@@ -110,6 +115,9 @@ function Play(props) {
   }
 
   function finishTurn(moves) {
+    if (isEndOfGame(moves)) {
+      setEndOfGame(true);
+    }
     setMoves(moves);
     sendMoves(moves);
   }
@@ -123,7 +131,7 @@ function Play(props) {
       let move = SkittleBot.move(board, player_piece);
 
       if (!move) {
-        console.log("bot resigns");
+        setEndOfGame(true);
         return;
       }
       setMoves([...moves, move]);
@@ -189,6 +197,7 @@ function Play(props) {
       &nbsp;
       <Button variant="outlined" onClick={toggleBot}>{useBot ? "Disable Bot" : "Enable Bot"}</Button>
     </div>
+    { endOfGame ? <GameEndModal /> : "" }
     </>);
 }
 
