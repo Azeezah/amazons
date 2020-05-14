@@ -110,11 +110,13 @@ function Board(props) {
   }
 
   function renderMoves() {
-    if (!moves || !moves.length) { return; }
+    if (!moves) { return; }
     const _board = movesToBoard(moves);
     // Highlight the last move.
-    for (let [x, y] of moves[moves.length-1]) {
-      _board[y][x].highlighted = true;
+    if (moves.length) {
+      for (let [x, y] of moves[moves.length-1]) {
+        _board[y][x].highlighted = true;
+      }
     }
     setBoard(_board);
     setPlayerToMove(moves.length%2===0 ? Pieces.player1 : Pieces.player2);

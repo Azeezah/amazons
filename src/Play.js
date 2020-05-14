@@ -13,7 +13,6 @@ import player2PieceImage from './second.svg';
 
 const useStyles = makeStyles({
   row: {
-    paddingTop: '30px',
     display: 'flex',
     justifyContent: 'space-evenly',
     alignItems: 'center',

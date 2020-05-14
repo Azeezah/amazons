@@ -3,6 +3,7 @@ import Authentication from './Authentication.js';
 import Nav from './Nav';
 import Home from './Home';
 import Play from './Play';
+import Replay from './Replay';
 import {
     BrowserRouter as Router,
     Switch,
@@ -21,6 +22,11 @@ function Routing() {
     return <Play gameid={gameid} user={user} />
   }
 
+  function ReplayById() {
+    const { gameid } = useParams();
+    return <Replay gameid={gameid} user={user} />
+  }
+
   return (<>
     <Nav user={user} setUser={setUser} />
     <Router>
@@ -30,6 +36,9 @@ function Routing() {
         </Route>
         <Route path="/play">
           <Play user={user} />
+        </Route>
+        <Route path="/replay/:gameid">
+          <ReplayById />
         </Route>
         <Route path="/">
           <Home user={user} />

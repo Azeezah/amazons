@@ -12,6 +12,7 @@ const useStyles = makeStyles({
     justifyContent: 'space-between',
     overflow: 'hidden',
     paddingTop: '30px',
+    paddingBottom: '30px',
   },
   logo: {
     position: 'relative', // Otherwise overflow hidden won't work.
