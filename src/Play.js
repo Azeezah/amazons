@@ -194,7 +194,7 @@ function Play(props) {
       &nbsp;
       <Button variant="outlined" onClick={toggleBot}>{useBot ? "Disable Bot" : "Enable Bot"}</Button>
     </div>
-    { endOfGame ? <GameEndModal /> : "" }
+    { endOfGame ? <GameEndModal gameid={gameid} /> : "" }
     </>);
 }
 
