@@ -65,13 +65,14 @@ function Home(props) {
   function listenForProposals() {
     const unsubscribe = firebase.firestore().collection('proposals').onSnapshot(snapshot => {
       let _proposals = [botProposal];
+      const five_minutes_ago = (new Date()).getTime() - (5 * 60 * 1000);
       snapshot.forEach(doc => {
         // Check whether proposal was accepted.
         if (!doc.data().open && doc.data().id === proposalId) {
           window.location = '/play/' + doc.data().gameid;
         }
-        // Gather open proposals.
-        if (doc.data().open) {
+        // Gather recent open proposals.
+        if (doc.data().open && doc.data().creation > five_minutes_ago) {
           _proposals.push({
             id: doc.data().id,
             proposerid: doc.data().proposerid,
@@ -94,6 +95,7 @@ function Home(props) {
       open: true,
       proposerid: user.id,
       proposerDisplayName: user.displayName,
+      creation: (new Date()).getTime(),
     });
     setProposalId(proposal.id);
   }
