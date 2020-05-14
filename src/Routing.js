@@ -4,6 +4,7 @@ import Nav from './Nav';
 import Home from './Home';
 import Play from './Play';
 import Replay from './Replay';
+import Profile from './Profile';
 import {
     BrowserRouter as Router,
     Switch,
@@ -27,6 +28,11 @@ function Routing() {
     return <Replay gameid={gameid} user={user} />
   }
 
+  function ProfileById() {
+    const { profileid } = useParams();
+    return <Profile profileid={profileid} user={user} />
+  }
+
   return (<>
     <Nav user={user} setUser={setUser} />
     <Router>
@@ -39,6 +45,12 @@ function Routing() {
         </Route>
         <Route path="/replay/:gameid">
           <ReplayById />
+        </Route>
+        <Route path="/profile/:profileid">
+          <ProfileById />
+        </Route>
+        <Route path="/profile">
+          <Profile user={user} />
         </Route>
         <Route path="/">
           <Home user={user} />

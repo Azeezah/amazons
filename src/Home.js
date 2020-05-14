@@ -118,9 +118,11 @@ function Home(props) {
         .update({open:false, gameid:game.id});
     }
     game.set({
+      id: game.id,
       proposalid:proposalid,
       player1id:player1id,
       player2id:player2id,
+      players: [player1id, player2id],
       playerToMove:Pieces.player1,
       moves:JSON.stringify([]),
     });

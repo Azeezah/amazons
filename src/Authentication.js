@@ -1,12 +1,12 @@
 import firebase from 'firebase';
 
-function getPseudonym(uid) {
-  const animals = ['Panda', 'Giraffe', 'Lion', 'Porcupine', 'Pikachu', 'Reindeer', 'Koala'];
-  const i = uid.charCodeAt(0) % animals.length;
-  return "Anonymous " + animals[i];
-}
-
 class Authentication {
+  static getPseudonym(uid) {
+    const animals = ['Panda', 'Giraffe', 'Lion', 'Porcupine', 'Pikachu', 'Reindeer', 'Koala'];
+    const i = uid.charCodeAt(0) % animals.length;
+    return "Anonymous " + animals[i];
+  }
+
   static async login() {
     try {
       const provider = new firebase.auth.GoogleAuthProvider();
@@ -29,7 +29,7 @@ class Authentication {
 
   static async logout() {
       try { await firebase.auth().signOut(); }
-      catch { return false; }
+      catch (error) { return false; }
       return true;
   }
 
@@ -40,7 +40,7 @@ class Authentication {
       if (_user) {
         const user = {
           id: _user.user.uid,
-          displayName: getPseudonym(_user.user.uid),
+          displayName: Authentication.getPseudonym(_user.user.uid),
           isAnonymous: true,
         }
         return user;
@@ -49,7 +49,7 @@ class Authentication {
       const _user = firebase.auth().currentUser;
       const user = {
         id: _user.uid,
-        displayName: _user.displayName || getPseudonym(_user.uid),
+        displayName: _user.displayName || Authentication.getPseudonym(_user.uid),
         email: _user.email,
         photoURL: _user.photoURL,
         isAnonymous: _user.isAnonymous,
@@ -73,7 +73,7 @@ class Authentication {
     }
     const user = {
       id: id,
-      displayName: names[id] || getPseudonym(id),
+      displayName: names[id] || Authentication.getPseudonym(id),
     };
     return user;
   }
