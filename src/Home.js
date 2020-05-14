@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import firebase from 'firebase';
 import {Pieces} from './BoardUtils';
-import Authentication from './Authentication';
 import amazonIcon from './first.svg';
 
 const useStyles = makeStyles({
@@ -50,7 +49,7 @@ const useStyles = makeStyles({
   }
 });
 
-function Home() {
+function Home(props) {
   const classes = useStyles();
   const [proposalId, setProposalId] = useState(null);
   const [proposals, setProposals] = useState([]);
@@ -60,11 +59,7 @@ function Home() {
     proposerid: 'skittlebotid',
     proposerDisplayName: 'SkittleBot',
   }
-
-  useEffect(() => {
-    Authentication.getUser().then(user=>setUser(user));
-  }, []);
-
+  useEffect(()=>{setUser(props.user)}, [props.user])
   useEffect(listenForProposals, [proposalId]);
 
   function listenForProposals() {
@@ -146,7 +141,7 @@ function Home() {
       {
         proposals && proposals.length
         ? proposals.map((p, i) =>
-            <Button variant="contained" className={classes.joinGameButton}
+            <Button variant="contained" key={i} className={classes.joinGameButton}
               data-proposalid={p.id}
               data-proposerid={p.proposerid}
               onClick={joinGame}>{p.proposerDisplayName}</Button>)

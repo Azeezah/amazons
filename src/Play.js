@@ -58,13 +58,11 @@ function Play(props) {
 
   const [game, setGame] = useState(defaultGame);
 
+  useEffect(()=>{setUser(props.user)}, [props.user])
   useEffect(()=>{setGameid(props.gameid);}, [props.gameid]);
   useEffect(listenForMoves, [gameid]);
   useEffect(()=>{loadGame();}, [gameid]);
   useEffect(updateLocalPlayer, [game, user]);
-  useEffect(() => {
-    Authentication.getUser().then(user=>setUser(user));
-  }, []);
 
   function updateLocalPlayer() {
     // Todo: Implement spectators.
