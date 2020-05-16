@@ -9,20 +9,29 @@ const useStyles = makeStyles({
   nav: {
     width: '100%',
     display: 'flex',
-    justifyContent: 'space-between',
-    overflow: 'hidden',
     paddingTop: '30px',
     paddingBottom: '30px',
+    '& div': {
+      float: 'left',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+    }
   },
   logo: {
-    position: 'relative', // Otherwise overflow hidden won't work.
-    left: 'calc(100vw / 2 - 50px)',
     filter: 'hue-rotate(193deg) contrast(1)',
     transform: 'rotateZ(-35deg)',
     width: '70px',
   },
-  authButton: {
-    marginRight: 'calc(100vw / 14)',
+  left: {
+    width: '40%',
+  },
+  right: {
+    width: '40%',
+  },
+  middle: {
+    width: '20%',
   },
 });
 
@@ -49,12 +58,25 @@ function Nav(props) {
   }
 
   return (<div className={classes.nav}>
-    <a href="/"><img className={classes.logo} src={logo} alt="logo" /></a>
+    <div className={classes.left}>
+      <Button href='/home'>Home</Button>
+      <Button href='/play'>Play</Button>
+    {/*
+      <Button>Watch</Button>
+      <Button>People</Button>
+      <Button>Learn</Button>
+    */}
+    </div>
+    <div className={classes.middle}>
+      <a href="/"><img className={classes.logo} src={logo} alt="logo" /></a>
+    </div>
+    <div className={classes.right}>
     {
       loggedIn
-      ? <Button onClick={logout} className={classes.authButton}>Logout</Button>
-      : <Button onClick={login} className={classes.authButton}>Login</Button>
+      ? <Button onClick={logout}>Logout</Button>
+      : <Button onClick={login}>Login</Button>
     }
+    </div>
   </div>);
 }
 
