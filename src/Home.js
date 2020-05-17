@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
-import firebase from 'firebase';
 import Database from './Database';
 import {Pieces} from './BoardUtils';
 import amazonIcon from './first.svg';
+import Redirect from './Redirect';
 
 const useStyles = makeStyles({
   leftCol: {
@@ -68,7 +68,7 @@ function Home(props) {
     const unsubscribe = Database.Proposals.listen((proposals)=>{
       const newProposal = proposals.find(p=>p.id === proposalId);
       if (newProposal && !newProposal.open) {
-        window.location = '/play' + newProposal.gameid;
+        Redirect.play(newProposal.gameid);
       }
       setProposals([botProposal, ...proposals.filter(
         p=>p.open && p.creation > five_minutes_ago)]);
@@ -93,9 +93,8 @@ function Home(props) {
     const userid = user.id;
     const players = [userid, proposerid];
     const [player1id, player2id] = Math.random() > 0.5 ? players : players.reverse();
-
     const game = Database.Games.create(proposalid, player1id, player2id);
-    window.location = '/play/' + game.id;
+    Redirect.play(game.id);
   }
 
   return (<div>

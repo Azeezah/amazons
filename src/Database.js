@@ -71,6 +71,7 @@ class Database {
           proposerDisplayName: doc.data().proposerDisplayName,
           creation: doc.data().creation,
           open: doc.data().open,
+          gameid: doc.data().gameid,
         }));
         callback(proposals);
       });

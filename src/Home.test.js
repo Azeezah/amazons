@@ -5,6 +5,7 @@ import * as firebaseTesting from '@firebase/testing';
 import firebaseApp from './firebase.js';  // For initializeApp
 import Database, { setDB } from './Database';
 import Home from './Home';
+import Redirect from './Redirect';
 
 const projectId = 'forest-games';
 const rules = fs.readFileSync('./firestore.rules', 'utf8');
@@ -92,7 +93,9 @@ describe('home page dashboard', () => {
     await findByText('displayname');
   });
 
+  // From the proposal accepter's perspective.
   test('creates game and closes proposal', async () => {
+    Redirect.play = jest.fn();
     const db = getDB();
     const user = {id: 'userid', displayName: 'displayname'};
     const { getByText, findByText, queryByText } = render(<Home user={user} />);
@@ -106,14 +109,38 @@ describe('home page dashboard', () => {
         creation: (new Date()).getTime(),
       });
     });
+    // User accepts the existing proposal.
     act(() => {
       fireEvent.click(getByText('displayname'));
     });
+    // Expect that the game is created, and the proposal is closed.
     await act(async () => {
       await db.collection('games').where('proposalid', '==', 'proposalid').get()
         .then(games => expect(games.docs.length).toBe(1));
       await db.collection('proposals').doc('proposalid').get()
         .then(doc => expect(doc.data().open).toBe(false));
     });
+    // Expect that the page redirects to the new game.
+    expect(Redirect.play).toBeCalled();
+  });
+
+  // From the proposer's perspective.
+  test('redirects to new game once proposal is accepted', async () => {
+    Redirect.play = jest.fn();
+    const db = getDB();
+    const user = {id: 'userid', displayName: 'displayname'};
+    const { getByText, findByText, queryByText } = render(<Home user={user} />);
+    // Propose a new game.
+    fireEvent.click(getByText('New Game'));
+    // Wait until the proposal is written to the database and picked up by the listener.
+    await findByText('displayname');
+    // Simulate an opponent match by closing the proposal.
+    await act(async () => {
+      const proposals = await db.collection('proposals').where('proposerid', '==', user.id).get();
+      const proposalid = proposals.docs[0].data().id;
+      await db.collection('proposals').doc(proposalid).update({open: false, gameid: 'gameid'});
+    });
+    // Expect that the page redirects to the new game.
+    expect(Redirect.play).toBeCalledWith('gameid');
   });
 });
