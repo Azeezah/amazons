@@ -80,14 +80,7 @@ function Home(props) {
   function newGame(e) {
     if (!user) { return; }
     e.target.disabled = true;
-    const proposal = firebase.firestore().collection('proposals').doc();
-    proposal.set({
-      id: proposal.id,
-      open: true,
-      proposerid: user.id,
-      proposerDisplayName: user.displayName,
-      creation: (new Date()).getTime(),
-    });
+    const proposal = Database.Proposals.create(user.id, user.displayName);
     setProposalId(proposal.id);
   }
 

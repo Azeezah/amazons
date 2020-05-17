@@ -80,4 +80,15 @@ describe('home page dashboard', () => {
     });
     expect(queryByText('displayname')).toBeNull();
   });
+
+  test('creates new proposals', async () => {
+    const db = getDB();
+    const user = {id: 'userid', displayName: 'displayname'};
+    const { getByText, findByText, queryByText } = render(<Home user={user} />);
+    expect(queryByText('displayname')).toBeNull();
+    act(() => {
+      fireEvent.click(getByText('New Game'));
+    });
+    await findByText('displayname');
+  });
 });

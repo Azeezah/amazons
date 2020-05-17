@@ -32,8 +32,19 @@ class Database {
   }
 
   static Proposals = class {
-    static async create(){}
-    static listen(callback){
+    static create(userid, displayName) {
+      const proposal = REF.PROPOSALS.doc();
+      proposal.set({
+        id: proposal.id,
+        proposerid: userid,
+        proposerDisplayName: displayName,
+        creation: (new Date()).getTime(),
+        open: true,
+      });
+      return proposal;
+    }
+
+    static listen(callback) {
       const unsubscribe = REF.PROPOSALS.onSnapshot(snapshot => {
         const proposals = snapshot.docs.map(doc=>({
           id: doc.data().id,
