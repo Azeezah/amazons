@@ -94,23 +94,7 @@ function Home(props) {
     const players = [userid, proposerid];
     const [player1id, player2id] = Math.random() > 0.5 ? players : players.reverse();
 
-    const game = firebase.firestore().collection('games').doc();
-    // Don't await these firebase calls so they don't block the game if they
-    // fail (the user is redirected to a bot game).
-    if (proposalid !== 'botproposal') {
-      firebase.firestore().collection('proposals').doc(proposalid)
-        .update({open:false, gameid:game.id});
-    }
-    game.set({
-      id: game.id,
-      creation: (new Date()).getTime(),
-      proposalid:proposalid,
-      player1id:player1id,
-      player2id:player2id,
-      players: [player1id, player2id],
-      playerToMove:Pieces.player1,
-      moves:JSON.stringify([]),
-    });
+    const game = Database.Games.create(proposalid, player1id, player2id);
     window.location = '/play/' + game.id;
   }
 

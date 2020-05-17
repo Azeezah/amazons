@@ -1,5 +1,6 @@
 import firebase from 'firebase';
 import firebaseApp from './firebase.js';  // For initializeApp
+import { Pieces } from './BoardUtils';
 
 let DB = firebase.firestore();
 let REF = {
@@ -26,7 +27,25 @@ class Database {
     static async getById(){}
     static async getByUserId(){}
     static async getRecent(){}
-    static async create(){}
+
+    static create(proposalid, player1id, player2id) {
+      const game = REF.GAMES.doc();
+      if (proposalid !== 'botproposal') {
+        REF.PROPOSALS.doc(proposalid).update({open:false, gameid:game.id});
+      }
+      game.set({
+        id: game.id,
+        creation: (new Date()).getTime(),
+        proposalid: proposalid,
+        player1id: player1id,
+        player2id: player2id,
+        players: [player1id, player2id],
+        playerToMove:Pieces.player1,
+        moves:JSON.stringify([]),
+      });
+      return game;
+    }
+
     static async saveMoves(){}
     static async listenForMoves(){}
   }

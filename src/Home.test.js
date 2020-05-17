@@ -91,4 +91,29 @@ describe('home page dashboard', () => {
     });
     await findByText('displayname');
   });
+
+  test('creates game and closes proposal', async () => {
+    const db = getDB();
+    const user = {id: 'userid', displayName: 'displayname'};
+    const { getByText, findByText, queryByText } = render(<Home user={user} />);
+    const proposal = db.collection('proposals').doc('proposalid');
+    await act(async () => {
+      await proposal.set({
+        id: 'proposalid',
+        open: true,
+        proposerid: 'proposerid',
+        proposerDisplayName: 'displayname',
+        creation: (new Date()).getTime(),
+      });
+    });
+    act(() => {
+      fireEvent.click(getByText('displayname'));
+    });
+    await act(async () => {
+      await db.collection('games').where('proposalid', '==', 'proposalid').get()
+        .then(games => expect(games.docs.length).toBe(1));
+      await db.collection('proposals').doc('proposalid').get()
+        .then(doc => expect(doc.data().open).toBe(false));
+    });
+  });
 });
