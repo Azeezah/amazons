@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import firebase from 'firebase';
+import Database from './Database';
 import {Pieces} from './BoardUtils';
 import amazonIcon from './first.svg';
 
@@ -63,24 +64,14 @@ function Home(props) {
   useEffect(listenForProposals, [proposalId]);
 
   function listenForProposals() {
-    const unsubscribe = firebase.firestore().collection('proposals').onSnapshot(snapshot => {
-      let _proposals = [botProposal];
-      const five_minutes_ago = (new Date()).getTime() - (5 * 60 * 1000);
-      snapshot.forEach(doc => {
-        // Check whether proposal was accepted.
-        if (!doc.data().open && doc.data().id === proposalId) {
-          window.location = '/play/' + doc.data().gameid;
-        }
-        // Gather recent open proposals.
-        if (doc.data().open && doc.data().creation > five_minutes_ago) {
-          _proposals.push({
-            id: doc.data().id,
-            proposerid: doc.data().proposerid,
-            proposerDisplayName: doc.data().proposerDisplayName,
-          });
-        }
-      });
-      setProposals(_proposals);
+    const five_minutes_ago = (new Date()).getTime() - (5 * 60 * 1000);
+    const unsubscribe = Database.Proposals.listen((proposals)=>{
+      const newProposal = proposals.find(p=>p.id === proposalId);
+      if (newProposal && !newProposal.open) {
+        window.location = '/play' + newProposal.gameid;
+      }
+      setProposals([botProposal, ...proposals.filter(
+        p=>p.open && p.creation > five_minutes_ago)]);
     });
     return () => unsubscribe();
   }
@@ -119,6 +110,7 @@ function Home(props) {
     }
     game.set({
       id: game.id,
+      creation: (new Date()).getTime(),
       proposalid:proposalid,
       player1id:player1id,
       player2id:player2id,
