@@ -16,6 +16,9 @@ const useStyles = makeStyles({
     flexDirection: 'column',
     marginLeft: '20px',
   },
+  board: {
+    flexShrink: '0',
+  },
   movesWidget: {
     boxShadow: '0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.2), 0 1px 5px 0 rgba(0,0,0,0.12)',
     height: '350px',
@@ -128,7 +131,9 @@ function Replay(props) {
 
   return (
     <div className={classes.row}>
-      <Board moves={moves.slice(0, moveIndex)} />
+      <div className={classes.board}>
+        <Board moves={moves.slice(0, moveIndex)} />
+      </div>
       <Moves moves={moves} moveIndex={moveIndex} nextMove={nextMove}
         prevMove={prevMove} />
     </div>
