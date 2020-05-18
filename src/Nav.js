@@ -61,8 +61,8 @@ function Nav(props) {
     <div className={classes.left}>
       <Button href='/home'>Home</Button>
       <Button href='/play'>Play</Button>
+      <Button href='/games'>Watch</Button>
     {/*
-      <Button>Watch</Button>
       <Button>People</Button>
       <Button>Learn</Button>
     */}
