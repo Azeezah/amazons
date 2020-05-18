@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Database from './Database';
-import {Pieces} from './BoardUtils';
 import amazonIcon from './first.svg';
 import Redirect from './Redirect';
 
@@ -38,7 +37,7 @@ const useStyles = makeStyles({
     textAlign: 'center',
   },
   amazonIcon: {
-    filter: 'drop-shadow(10px 20px 1px grey)',
+    filter: 'invert(.75) hue-rotate(180deg)',
     maxWidth: '300px',
   },
   featured: {
@@ -101,7 +100,8 @@ function Home(props) {
     <div className={classes.leftCol}>
       <div className={classes.featured}>
         <img src={amazonIcon} alt="featured player icon" className={classes.amazonIcon} />
-        Featured Player: SkittleBot
+        Featured Player:
+        <Button href="/profile/skittlebotid">SkittleBot</Button>
       </div>
     </div>
     <div className={classes.centerCol}>
