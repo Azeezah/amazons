@@ -4,6 +4,7 @@ import firebase from 'firebase';
 import Board from './Board';
 import leftArrow from './left.svg';
 import rightArrow from './right.svg';
+import Database from './Database';
 
 const useStyles = makeStyles({
   row: {
@@ -99,8 +100,9 @@ function Replay(props) {
 
   function loadGame() {
     if (!props.gameid) { return; }
-    firebase.firestore().collection('games').doc(props.gameid).get()
-      .then(doc=>setMoves(JSON.parse(doc.data().moves)));
+    Database.Games.getById(props.gameid)
+      .then(game=>setMoves(JSON.parse(game.moves)))
+      .catch(err=>console.log(err));
   }
 
   function nextMove() {

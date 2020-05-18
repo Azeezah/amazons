@@ -61,7 +61,7 @@ function Play(props) {
   useEffect(()=>{setUser(props.user)}, [props.user])
   useEffect(()=>{setGameid(props.gameid);}, [props.gameid]);
   useEffect(listenForMoves, [gameid]);
-  useEffect(()=>{loadGame();}, [gameid]);
+  useEffect(loadGame, [gameid]);
   useEffect(updateLocalPlayer, [game, user]);
 
   function updateLocalPlayer() {
@@ -73,18 +73,16 @@ function Play(props) {
     setOpponent(user.id === game.player1id ? Pieces.player2 : Pieces.player1);
   }
 
-  async function loadGame() {
+  function loadGame() {
     if (!gameid) { return; }
-    const response = await firebase.firestore().collection('games').doc(gameid).get();
-    if (!response) { console.log("Couldn't load game."); return; }
-    if (!response.exists) { console.log("Game does not exist: ", gameid); return; }
-    const _game = response.data();
-    _game.player1 = await Authentication.getUserById(_game.player1id);
-    _game.player2 = await Authentication.getUserById(_game.player2id);
-    if (![_game.player1id, _game.player2id].includes('skittlebotid')) {
-      setUseBot(false);
-    }
-    setGame(_game);
+    Database.Games.getById(gameid).then(async _game => {
+      _game.player1 = await Authentication.getUserById(_game.player1id);
+      _game.player2 = await Authentication.getUserById(_game.player2id);
+      if (!_game.players.includes('skittlebotid')) {
+        setUseBot(false);
+      }
+      setGame(_game);
+    }).catch(err => console.log("Couldn't load game:", gameid, err));
   }
 
   function listenForMoves() {

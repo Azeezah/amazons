@@ -24,7 +24,16 @@ class Database {
   }
 
   static Games = class {
-    static async getById(){}
+    static async getById(id) {
+      return REF.GAMES.doc(id).get()
+      .then(async doc => {
+        if (!doc.exists) {
+          throw Error("Game does not exist: " + id);
+        }
+        return doc.data() || {player1id : 'joker'};
+      });
+    }
+
     static async getByUserId(){}
     static async getRecent(){}
 
