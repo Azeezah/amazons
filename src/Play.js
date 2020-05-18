@@ -10,6 +10,7 @@ import firebase from 'firebase';
 import Authentication from './Authentication';
 import player1PieceImage from './first.svg';
 import player2PieceImage from './second.svg';
+import Database from './Database';
 
 const useStyles = makeStyles({
   row: {
@@ -88,14 +89,7 @@ function Play(props) {
 
   function listenForMoves() {
     if (!gameid) { return; }
-    const unsubscribe = firebase.firestore().collection('games')
-      .doc(gameid).onSnapshot(doc => {
-      if (!doc.exists) {
-        console.log("Cannot listen for moves from game:", gameid);
-        return;
-      }
-      console.log('Player to move:', doc.data().playerToMove);
-      let moves = JSON.parse(doc.data().moves);
+    const unsubscribe = Database.Games.listenForMoves(gameid, (moves) => {
       if (moves && moves.length) {
         setMoves(moves);
         if (isEndOfGame(moves)) {

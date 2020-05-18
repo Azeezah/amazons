@@ -47,7 +47,19 @@ class Database {
     }
 
     static async saveMoves(){}
-    static async listenForMoves(){}
+
+    static listenForMoves(gameid, callback){
+      const unsubscribe = REF.GAMES.doc(gameid).onSnapshot(doc => {
+        if (!doc.exists) {
+          console.log("Cannot listen for moves from game:", gameid);
+          return;
+        }
+        console.log('Player to move:', doc.data().playerToMove);
+        let moves = JSON.parse(doc.data().moves);
+        callback(moves);
+      });
+      return () => unsubscribe();
+    }
   }
 
   static Proposals = class {
