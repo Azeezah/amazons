@@ -19,18 +19,18 @@ function Routing() {
     setTimeout(()=>{Authentication.getUser().then(user=>setUser(user))}, 1000);
   }, []);
 
-  function PlayById() {
-    const { gameid } = useParams();
+  function PlayById(props) {
+    const { gameid } = props.match.params;
     return <Play gameid={gameid} user={user} />
   }
 
-  function ReplayById() {
-    const { gameid } = useParams();
+  function ReplayById(props) {
+    const { gameid } = props.match.params;
     return <Replay gameid={gameid} user={user} />
   }
 
-  function ProfileById() {
-    const { profileid } = useParams();
+  function ProfileById(props) {
+    const { profileid } = props.match.params;
     return <Profile profileid={profileid} user={user} />
   }
 
@@ -38,18 +38,12 @@ function Routing() {
     <Nav user={user} setUser={setUser} />
     <Router>
       <Switch>
-        <Route path="/play/:gameid">
-          <PlayById />
-        </Route>
+        <Route path="/play/:gameid" render={PlayById} />
         <Route path="/play">
           <Play user={user} />
         </Route>
-        <Route path="/replay/:gameid">
-          <ReplayById />
-        </Route>
-        <Route path="/profile/:profileid">
-          <ProfileById />
-        </Route>
+        <Route path="/replay/:gameid" render={ReplayById} />
+        <Route path="/profile/:profileid" render={ProfileById} />
         <Route path="/profile">
           <Profile user={user} />
         </Route>
