@@ -7,6 +7,7 @@ import Replay from './Replay';
 import Profile from './Profile';
 import Games from './Games';
 import People from './People';
+import Learn from './Learn';
 import {
     BrowserRouter as Router,
     Switch,
@@ -52,6 +53,9 @@ function Routing() {
         </Route>
         <Route path="/people">
           <People user={user} />
+        </Route>
+        <Route path="/learn">
+          <Learn user={user} />
         </Route>
         <Route path="/">
           <Home user={user} />

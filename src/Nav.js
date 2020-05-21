@@ -62,9 +62,7 @@ function Nav(props) {
       <Button href='/'>Play</Button>
       <Button href='/games'>Watch</Button>
       <Button href='/people'>People</Button>
-    {/*
-      <Button>Learn</Button>
-    */}
+      <Button href='/learn'>Learn</Button>
     </div>
     <div className={classes.middle}>
       <a href="/"><img className={classes.logo} src={logo} alt="logo" /></a>
