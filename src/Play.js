@@ -99,6 +99,7 @@ function Play(props) {
   }
 
   function sendMoves(moves) {
+    if (!gameid) { return; }
     let _moves = JSON.stringify(moves);
     firebase.firestore().collection('games').doc(gameid).update({moves:_moves, playerToMove:opponent});
   }
@@ -125,9 +126,11 @@ function Play(props) {
       }
       setMoves([...moves, move]);
 
-      // Local bot should send moves to the database for the spectators.
-      let _moves = JSON.stringify([...moves, move]);
-      firebase.firestore().collection('games').doc(gameid).update({moves:_moves, playerToMove:player});
+      if (gameid) {
+        // Local bot should send moves to the database for the spectators.
+        let _moves = JSON.stringify([...moves, move]);
+        firebase.firestore().collection('games').doc(gameid).update({moves:_moves, playerToMove:player});
+      }
     }
   }
 
