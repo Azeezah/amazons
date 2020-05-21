@@ -6,11 +6,11 @@ import Play from './Play';
 import Replay from './Replay';
 import Profile from './Profile';
 import Games from './Games';
+import People from './People';
 import {
     BrowserRouter as Router,
     Switch,
     Route,
-    useParams,
   } from "react-router-dom";
 
 function Routing() {
@@ -49,6 +49,9 @@ function Routing() {
         </Route>
         <Route path="/games">
           <Games user={user} />
+        </Route>
+        <Route path="/people">
+          <People user={user} />
         </Route>
         <Route path="/">
           <Home user={user} />

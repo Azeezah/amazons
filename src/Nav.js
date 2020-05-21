@@ -59,11 +59,10 @@ function Nav(props) {
 
   return (<div className={classes.nav}>
     <div className={classes.left}>
-      <Button href='/home'>Home</Button>
-      <Button href='/play'>Play</Button>
+      <Button href='/'>Play</Button>
       <Button href='/games'>Watch</Button>
+      <Button href='/people'>People</Button>
     {/*
-      <Button>People</Button>
       <Button>Learn</Button>
     */}
     </div>

@@ -70,19 +70,20 @@ function Profile(props) {
       // Fetch games for user id.
       const games_snapshot = await firebase.firestore().collection('games')
         .where('players', 'array-contains', profileUser.id).get();
-      const player_ids = [];
+      const player_ids = new Set();
       if (games_snapshot.docs.length === 0) {
         console.log('This user hasn\'t played any games yet.');
         setGames([]);
         return;
       }
       for (let doc of games_snapshot.docs) {
-        player_ids.push(doc.data().player1id);
-        player_ids.push(doc.data().player2id);
+        player_ids.add(doc.data().player1id);
+        player_ids.add(doc.data().player2id);
       }
       // Fetch display names.
+      // Where only supports upto 10 in the `in` set.
       const players_snapshot = await firebase.firestore().collection('users')
-        .where('id', 'in', player_ids).get();
+        .where('id', 'in', [...player_ids].slice(0, 10)).get();
       const names = {};
       for (let doc of players_snapshot.docs) {
         names[doc.data().id] = doc.data().displayName;
