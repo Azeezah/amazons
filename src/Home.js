@@ -52,13 +52,13 @@ const useStyles = makeStyles({
 function Home(props) {
   const classes = useStyles();
   const [proposalId, setProposalId] = useState(null);
-  const [proposals, setProposals] = useState([]);
   const [user, setUser] = useState(null);
   const botProposal = {
     id: 'botproposal',
     proposerid: 'skittlebotid',
     proposerDisplayName: 'SkittleBot',
   }
+  const [proposals, setProposals] = useState([botProposal]);
   useEffect(()=>{setUser(props.user)}, [props.user])
   useEffect(listenForProposals, [proposalId]);
 
@@ -84,7 +84,7 @@ function Home(props) {
   }
 
   // Todo: Make this a transaction since it requires atomicity.
-  async function joinGame(e) {
+  function joinGame(e) {
     if (!user) { return; }
     // With the material buttons, onClick may be called on button or a child within button.
     const proposalid = e.target.dataset.proposalid || e.target.parentNode.dataset.proposalid;
@@ -92,8 +92,11 @@ function Home(props) {
     const userid = user.id;
     const players = [userid, proposerid];
     const [player1id, player2id] = Math.random() > 0.5 ? players : players.reverse();
-    const game = Database.Games.create(proposalid, player1id, player2id);
-    Redirect.play(game.id);
+    Database.Games.create(proposalid, player1id, player2id)
+      .then(game => Redirect.play(game.id));
+    // If the game cannot be created after however many asynchronous retries in
+    // 1500ms, redirect to a default game.
+    setTimeout(Redirect.play, 1500);
   }
 
   return (<div>

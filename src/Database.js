@@ -42,7 +42,7 @@ class Database {
       if (proposalid !== 'botproposal') {
         REF.PROPOSALS.doc(proposalid).update({open:false, gameid:game.id});
       }
-      game.set({
+      return game.set({
         id: game.id,
         creation: (new Date()).getTime(),
         proposalid: proposalid,
@@ -51,8 +51,7 @@ class Database {
         players: [player1id, player2id],
         playerToMove:Pieces.player1,
         moves:JSON.stringify([]),
-      });
-      return game;
+      }).then(()=>game);
     }
 
     static async saveMoves(){}

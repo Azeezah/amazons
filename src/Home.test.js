@@ -87,9 +87,7 @@ describe('home page dashboard', () => {
     const user = {id: 'userid', displayName: 'displayname'};
     const { getByText, findByText, queryByText } = render(<Home user={user} />);
     expect(queryByText('displayname')).toBeNull();
-    act(() => {
-      fireEvent.click(getByText('New Game'));
-    });
+    fireEvent.click(getByText('New Game'));
     await findByText('displayname');
   });
 
@@ -110,9 +108,7 @@ describe('home page dashboard', () => {
       });
     });
     // User accepts the existing proposal.
-    act(() => {
-      fireEvent.click(getByText('displayname'));
-    });
+    fireEvent.click(getByText('displayname'));
     // Expect that the game is created, and the proposal is closed.
     await act(async () => {
       await db.collection('games').where('proposalid', '==', 'proposalid').get()

@@ -1,5 +1,5 @@
 class Redirect {
-  static play(gameid) {
+  static play(gameid='') {
     window.location.href = '/play/' + gameid;
   }
 }
