@@ -40,19 +40,20 @@ function Games(props) {
       // Fetch games.
       const games_snapshot = await firebase.firestore().collection('games')
         .where('creation', '>', seven_days_ago).get();
-      const player_ids = [];
+
+      const player_ids = new Set();
       if (games_snapshot.docs.length === 0) {
         console.log('No one has started any games recently.');
         setGames([]);
         return;
       }
       for (let doc of games_snapshot.docs) {
-        player_ids.push(doc.data().player1id);
-        player_ids.push(doc.data().player2id);
+        player_ids.add(doc.data().player1id);
+        player_ids.add(doc.data().player2id);
       }
       // Fetch display names.
       const players_snapshot = await firebase.firestore().collection('users')
-        .where('id', 'in', player_ids).get();
+        .where('id', 'in', [...player_ids].slice(0, 10)).get();
       const names = {};
       for (let doc of players_snapshot.docs) {
         names[doc.data().id] = doc.data().displayName;
