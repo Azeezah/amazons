@@ -4,6 +4,9 @@ import Button from "@material-ui/core/Button";
 import Database from './Database';
 import amazonIcon from './first.svg';
 import Redirect from './Redirect';
+import Tooltip from '@material-ui/core/Tooltip';
+import Snackbar from '@material-ui/core/Snackbar';
+import Alert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles({
   leftCol: {
@@ -59,8 +62,26 @@ function Home(props) {
     proposerDisplayName: 'SkittleBot',
   }
   const [proposals, setProposals] = useState([botProposal]);
+  const [showCopiedAlert, setShowCopiedAlert] = useState(false);
+  const [showCopyTooltip, setShowCopyTooltip] = useState(false);
+
   useEffect(()=>{setUser(props.user)}, [props.user])
   useEffect(listenForProposals, [proposalId]);
+
+
+  function copyProposalLink() {
+    navigator.clipboard.writeText(window.location.href+'proposal/'+proposalId);
+    setShowCopiedAlert(true);
+  }
+
+  function closeCopiedAlert() {
+    setShowCopiedAlert(false);
+  }
+
+  function openCopyTooltip() {
+    setShowCopyTooltip(true);
+    setTimeout(()=>setShowCopyTooltip(false), 6000);
+  }
 
   function listenForProposals() {
     const five_minutes_ago = (new Date()).getTime() - (5 * 60 * 1000);
@@ -81,6 +102,7 @@ function Home(props) {
     e.target.disabled = true;
     const proposal = Database.Proposals.create(user.id, user.displayName);
     setProposalId(proposal.id);
+    openCopyTooltip();
   }
 
   // Todo: Make this a transaction since it requires atomicity.
@@ -116,14 +138,27 @@ function Home(props) {
       {
         proposals && proposals.length
         ? proposals.map((p, i) =>
+          (p.id === proposalId
+            ?
+            <Tooltip open={showCopyTooltip} title="Click to copy challenge link!" placement="left" arrow>
             <Button variant="contained" key={i} className={classes.joinGameButton}
               data-proposalid={p.id}
               data-proposerid={p.proposerid}
-              onClick={joinGame}>{p.proposerDisplayName}</Button>)
+              onClick={copyProposalLink}>{p.proposerDisplayName}</Button>
+            </Tooltip>
+            :
+            <Button variant="contained" key={i} className={classes.joinGameButton}
+              data-proposalid={p.id}
+              data-proposerid={p.proposerid}
+              onClick={joinGame}>{p.proposerDisplayName}</Button>
+          ))
         : ""
       }
       </div>
     </div>
+    <Snackbar open={showCopiedAlert} onClose={closeCopiedAlert} autoHideDuration={6000}>
+      <Alert elevation={6} variant="filled" severity="success">Copied challenge URL!</Alert>
+    </Snackbar>
   </div>);
 }
 

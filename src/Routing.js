@@ -8,6 +8,7 @@ import Profile from './Profile';
 import Games from './Games';
 import People from './People';
 import Learn from './Learn';
+import Proposal from './Proposal';
 import {
     BrowserRouter as Router,
     Switch,
@@ -35,6 +36,11 @@ function Routing() {
     return <Profile profileid={profileid} user={user} />
   }
 
+  function ProposalById(props) {
+    const { proposalid } = props.match.params;
+    return <Proposal proposalid={proposalid} user={user} />
+  }
+
   return (<>
     <Nav user={user} setUser={setUser} />
     <Router>
@@ -57,6 +63,7 @@ function Routing() {
         <Route path="/learn">
           <Learn user={user} />
         </Route>
+        <Route path="/proposal/:proposalid" render={ProposalById} />
         <Route path="/">
           <Home user={user} />
         </Route>
