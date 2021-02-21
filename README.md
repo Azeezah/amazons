@@ -6,7 +6,7 @@ Go here to play: https://forest-games.web.app/
 
 Amazons is a turnbased game, where the winner is the last player to move.  So you want to restrict your opponent's space until they cannot move.
 
-Each player controls 4 amazons that move only in straight lines.
+Each player controls 4 amazons that move only in straight lines (horizontally, vertically and diagonally).
 
 Whenever an amazon moves, she throws an arrow in a straight line.
 
